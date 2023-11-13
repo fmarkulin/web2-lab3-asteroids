@@ -8,38 +8,17 @@ window.addEventListener("load", () => {
     myGameArea.canvas.height = document.body.clientHeight;
   });
 
+  const pressedKeys = {}; // objekt za pritisnute tipke
   // dodaj event listenere za pritiske strelica
   window.addEventListener("keydown", keydown);
   window.addEventListener("keyup", keyup);
 
   function keydown(e) {
-    switch (e.key) {
-      case "ArrowUp":
-        myGamePiece.speed_y = 3; // idi prema gore
-        break;
-      case "ArrowDown":
-        myGamePiece.speed_y = -3; // idi prema dolje
-        break;
-      case "ArrowLeft":
-        myGamePiece.speed_x = -3; // idi ulijevo
-        break;
-      case "ArrowRight":
-        myGamePiece.speed_x = 3; // idi udesno
-        break;
-    }
+    pressedKeys[e.key] = true; // spremi pritisnutu tipku
   }
 
   function keyup(e) {
-    switch (e.key) {
-      case "ArrowUp":
-      case "ArrowDown":
-        myGamePiece.speed_y = 0; // zaustavi se
-        break;
-      case "ArrowLeft":
-      case "ArrowRight":
-        myGamePiece.speed_x = 0;
-        break;
-    }
+    pressedKeys[e.key] = false; // spremi otpuštenu tipku
   }
 
   var myGamePiece; // objekt za igrača
@@ -155,18 +134,36 @@ window.addEventListener("load", () => {
     };
     this.newPos = function () {
       // ažuriraj poziciju objekta
-      // ako asteroid izađe izvan canvasa, vrati ga na suprotnu stranu
+      // ako objekt izađe izvan canvasa, vrati ga na suprotnu stranu
       if (this.x < 0) this.x = myGameArea.canvas.width;
       else if (this.x > myGameArea.canvas.width) this.x = 0;
       if (this.y < 0) this.y = myGameArea.canvas.height;
       else if (this.y > myGameArea.canvas.height) this.y = 0;
+
+      if (this.type === "player") {
+        // ako je igrač, pomiče se strelicama
+        if (pressedKeys["ArrowUp"]) {
+          this.speed_y = 3;
+        } else if (pressedKeys["ArrowDown"]) {
+          this.speed_y = -3;
+        } else {
+          this.speed_y = 0;
+        }
+
+        if (pressedKeys["ArrowLeft"]) {
+          this.speed_x = -3;
+        } else if (pressedKeys["ArrowRight"]) {
+          this.speed_x = 3;
+        } else {
+          this.speed_x = 0;
+        }
+      }
 
       this.x += this.speed_x; // pomakni objekt
       this.y -= this.speed_y;
     };
   }
 
-  var gameOver = false;
   var collisionSound = new Audio("death.mp3"); // zvuk za koliziju
   var startTime = new Date(); // vrijeme početka igre
   const highScore = localStorage.getItem("highscore"); // dohvati najbolje vrijeme
