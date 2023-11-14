@@ -24,18 +24,9 @@ window.addEventListener("load", () => {
   var myGamePiece; // objekt za igrača
   var asteroids = []; // polje za asteroide
 
-  function startGame() {
-    myGameArea.start(); // pokreni igru
-    myGamePiece = new component(
-      30,
-      30,
-      myGameArea.canvas.width / 2,
-      myGameArea.canvas.height / 2,
-      "player"
-    ); // stvori igrača
-
-    // generiranje asteroida
-    for (var i = 0; i < 20; i++) {
+  function generateAsteroids(count) {
+    // funkcija za generiranje asteroida
+    for (var i = 0; i < count; i++) {
       var x, y, speed_x, speed_y; // varijable za poziciju i brzinu
 
       // odaberi slučajnu stranu: 0 = gore, 1 = dolje, 2 = lijevo, 3 = desno
@@ -72,6 +63,20 @@ window.addEventListener("load", () => {
     }
   }
 
+  function startGame() {
+    myGameArea.start(); // pokreni igru
+    myGamePiece = new component(
+      30,
+      30,
+      myGameArea.canvas.width / 2,
+      myGameArea.canvas.height / 2,
+      "player"
+    ); // stvori igrača
+
+    // generiraj 15 asteroida
+    generateAsteroids(15);
+  }
+
   var myGameArea = {
     // objekt za canvas
     canvas: document.createElement("canvas"),
@@ -83,6 +88,7 @@ window.addEventListener("load", () => {
       document.body.insertBefore(this.canvas, document.body.childNodes[0]); // dodaj canvas na stranicu
       this.frameNo = 0;
       this.interval = setInterval(updateGameArea, 17); // ažuriraj stanje igre svakih 17 ms (~60 fps)
+      this.asteroidInterval = setInterval(() => generateAsteroids(5), 5000); // generiraj 5 novih asteroida svakih 5 sekundi
     },
     stop: function () {
       clearInterval(this.interval); // zaustavi igru
